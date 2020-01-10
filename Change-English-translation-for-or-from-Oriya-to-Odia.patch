@@ -1,0 +1,30 @@
+From 3f2a71b88063a4dd1e55c99ac8b99c5e01f95e36 Mon Sep 17 00:00:00 2001
+From: Mike FABIAN <mfabian@redhat.com>
+Date: Tue, 10 Dec 2013 07:39:27 +0100
+Subject: [PATCH] =?UTF-8?q?Change=20English=20translation=20for=20or=20fro?=
+ =?UTF-8?q?m=20=E2=80=9COriya=E2=80=9D=20to=20=E2=80=9COdia=E2=80=9D?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+See: https://bugzilla.redhat.com/show_bug.cgi?id=1039496
+---
+ data/languages.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/languages.xml b/data/languages.xml
+index ea77c9e..74c8beb 100644
+--- a/data/languages.xml
++++ b/data/languages.xml
+@@ -14985,7 +14985,7 @@
+       <name><languageId>de</languageId><trName>Orija</trName></name>
+       <name><languageId>dz</languageId><trName>ཨོ་རི་ཡ་ཁ</trName></name>
+       <name><languageId>el</languageId><trName>Ορίγια</trName></name>
+-      <name><languageId>en</languageId><trName>Oriya</trName></name>
++      <name><languageId>en</languageId><trName>Odia</trName></name>
+       <name><languageId>eo</languageId><trName>orijo</trName></name>
+       <name><languageId>es</languageId><trName>oriya</trName></name>
+       <name><languageId>et</languageId><trName>oria</trName></name>
+-- 
+1.8.4.2
+

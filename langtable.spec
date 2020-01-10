@@ -1,6 +1,6 @@
 Name:           langtable
 Version:        0.0.13
-Release:        1%{?dist}
+Release:        4%{?dist}
 Summary:        Guessing reasonable defaults for locale, keyboard layout, territory, and language.
 Group:          Development/Tools
 # the translations in languages.xml and territories.xml are (mostly)
@@ -10,6 +10,9 @@ Group:          Development/Tools
 License:        GPLv3+
 URL:            https://github.com/mike-fabian/langtable
 Source0:        http://mfabian.fedorapeople.org/langtable/%{name}-%{version}.tar.gz
+Patch0:         Change-English-translation-for-or-from-Oriya-to-Odia.patch
+Patch1:         Add-support-for-timezone-translations.patch
+Patch2:         Fix-Chinese-translation-problem.patch
 BuildArch:      noarch
 BuildRequires:  python2-devel
 
@@ -42,6 +45,9 @@ This package contains the data files for langtable.
 
 %prep
 %setup -q
+%patch0 -p1 -b .Change-English-translation-for-or-from-Oriya-to-Odia
+%patch1 -p1 -b .Add-support-for-timezone-translations
+%patch2 -p1 -b .Fix-Chinese-translation-problem
 
 %build
 perl -pi -e "s,_datadir = '(.*)',_datadir = '%{_datadir}/langtable'," langtable.py
@@ -56,6 +62,8 @@ gzip --force --best $RPM_BUILD_ROOT/%{_datadir}/langtable/*.xml
 xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/keyboards.rng $RPM_BUILD_ROOT/%{_datadir}/langtable/keyboards.xml.gz
 xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/languages.rng $RPM_BUILD_ROOT/%{_datadir}/langtable/languages.xml.gz
 xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/territories.rng $RPM_BUILD_ROOT/%{_datadir}/langtable/territories.xml.gz
+xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/timezoneidparts.rng $RPM_BUILD_ROOT/%{_datadir}/langtable/timezoneidparts.xml.gz
+xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/timezones.rng $RPM_BUILD_ROOT/%{_datadir}/langtable/timezones.xml.gz
 
 %files
 %doc README COPYING ChangeLog unicode-license.txt test_cases.txt
@@ -68,6 +76,16 @@ xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/territor
 %{_datadir}/langtable/*.xml.gz
 
 %changelog
+* Thu Jan 09 2014 Mike FABIAN <mfabian@redhat.com> - 0.0.13-4
+- Add Add-support-for-timezone-translations.patch (Related: rhbz#1015209)
+- Add Fix-Chinese-translation-problem.patch (Related: rhbz#1015209)
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 0.0.13-3
+- Mass rebuild 2013-12-27
+
+* Thu Dec 12 2013 Mike FABIAN <mfabian@redhat.com> - 0.0.13-2
+- Change English translation for or from “Oriya” to “Odia” (Resolves: rhbz#1040778)
+
 * Thu Sep 05 2013 Mike FABIAN <mfabian@redhat.com> - 0.0.13-1
 - Update to 0.0.13
 - Serbian keyboards are 'rs' not 'sr' (by Vratislav Podzimek)

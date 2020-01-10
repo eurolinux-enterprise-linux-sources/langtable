@@ -1,0 +1,242 @@
+From e70b8fc28a7e2ff683679533c1e0f02a19ab7d1d Mon Sep 17 00:00:00 2001
+From: Mike FABIAN <mfabian@redhat.com>
+Date: Wed, 11 Sep 2013 13:15:24 +0200
+Subject: [PATCH 2/2] Add the default script if not specified in queries for
+ Chinese; Always return the territory name as well if queried in
+ language_name()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- If the language 'zh' and a (Chinese) territory like 'TW' but no
+  script is used in a query, add the appropriate default script for
+  that territory, i.e. 'Hant' in this case. I.e. expand 'zh_TW'
+  in queries automatically to 'zh_Hant_TW' and 'zh_CN' to 'zh_Hans_CN'.
+  Gives better results, especially it avoids having to use
+  different translation entries for all Chinese regions, in most
+  cases translation entries for 'zh' and 'zh_Hant' are enough then.
+  For example, to translate “Europe” for all variants of Chinese,
+  the two translations
+
+      <name><languageId>zh</languageId><trName>欧洲</trName></name>
+      <name><languageId>zh_Hant</languageId><trName>歐洲</trName></name>
+
+   are now enough, there is no need to have extra entries for zh_TW,
+   zh_CN, zh_SG, zh_MO, zh_HK. If one really wants the Hongkong Chinese
+   translation to be really different from the generic traditional
+   Chinese translation, one can add a
+
+      <name><languageId>zh_Hant</languageId><trName>special zh_HK translation</trName></name>
+
+    of course, but in most cases the automatic adding of the default
+    script  in this commit makes this superfluous.
+
+- If a territory was included in the query  language_name(),
+  always return a translation for the  territory as well, not
+  only the language.
+
+  For example, language_name(languageId="zh_Hans_CN") now returns
+  “简体中文 (中国)” instead  of only “简体中文” and
+  language_name(languageId="sr_Latn_RS") returns
+  “Srpski (Latinica) (Srbija)” instead  of only “Srpski (Latinica)”
+---
+ data/languages.xml | 10 +++++-----
+ langtable.py       | 31 +++++++++++++++++++++++++++----
+ test_cases.txt     | 26 +++++++++++++-------------
+ 3 files changed, 45 insertions(+), 22 deletions(-)
+
+diff --git a/data/languages.xml b/data/languages.xml
+index 7c946d7..4685e09 100644
+--- a/data/languages.xml
++++ b/data/languages.xml
+@@ -21029,7 +21029,7 @@
+     </timezones>
+   </language>
+   <language>
+-    <languageId>zh_CN</languageId>
++    <languageId>zh_Hans_CN</languageId>
+     <iso639-1>zh</iso639-1>
+     <iso639-2-t>zho</iso639-2-t>
+     <iso639-2-b>chi</iso639-2-b>
+@@ -21054,7 +21054,7 @@
+     </timezones>
+   </language>
+   <language>
+-    <languageId>zh_HK</languageId>
++    <languageId>zh_Hant_HK</languageId>
+     <iso639-1>zh</iso639-1>
+     <iso639-2-t>zho</iso639-2-t>
+     <iso639-2-b>chi</iso639-2-b>
+@@ -21322,7 +21322,7 @@
+     </timezones>
+   </language>
+   <language>
+-    <languageId>zh_MO</languageId>
++    <languageId>zh_Hant_MO</languageId>
+     <iso639-1>zh</iso639-1>
+     <iso639-2-t>zho</iso639-2-t>
+     <iso639-2-b>chi</iso639-2-b>
+@@ -21349,7 +21349,7 @@
+     </timezones>
+   </language>
+   <language>
+-    <languageId>zh_SG</languageId>
++    <languageId>zh_Hans_SG</languageId>
+     <iso639-1>zh</iso639-1>
+     <iso639-2-t>zho</iso639-2-t>
+     <iso639-2-b>chi</iso639-2-b>
+@@ -21375,7 +21375,7 @@
+     </timezones>
+   </language>
+   <language>
+-    <languageId>zh_TW</languageId>
++    <languageId>zh_Hant_TW</languageId>
+     <iso639-1>zh</iso639-1>
+     <iso639-2-t>zho</iso639-2-t>
+     <iso639-2-b>chi</iso639-2-b>
+diff --git a/langtable.py b/langtable.py
+index 6e7723a..f74a1d0 100644
+--- a/langtable.py
++++ b/langtable.py
+@@ -860,6 +860,13 @@ def _parse_and_split_languageId(languageId=None, scriptId=None, territoryId=None
+                 territoryId = match.group('territory')
+         else:
+             logging.info("languageId contains invalid locale id=%s" %languageId)
++    # if the language is Chinese and only the territory is given
++    # but not the script, add the default script for the territory:
++    if languageId == 'zh' and territoryId and not scriptId:
++        if territoryId in ['CN', 'SG']:
++            scriptId = 'Hans'
++        elif territoryId in ['HK', 'MO', 'TW']:
++            scriptId = 'Hant'
+     return (languageId, scriptId, territoryId)
+ 
+ def territory_name(territoryId = None, languageIdQuery = None, scriptIdQuery = None, territoryIdQuery = None):
+@@ -971,22 +978,38 @@ def language_name(languageId = None, scriptId = None, territoryId = None, langua
+     if languageId and scriptId:
+         icuLocaleId = languageId+'_'+scriptId
+         if icuLocaleId in _languages_db:
++            cname = territory_name(territoryId=territoryId,
++                                   languageIdQuery=languageIdQuery,
++                                   scriptIdQuery=scriptIdQuery,
++                                   territoryIdQuery=territoryIdQuery)
+             if languageIdQuery and  scriptIdQuery and territoryIdQuery:
+                 icuLocaleIdQuery = languageIdQuery+'_'+scriptIdQuery+'_'+territoryIdQuery
+                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
+-                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    if cname:
++                        return lname + ' ('+cname+')'
++                    return lname
+             if languageIdQuery and  scriptIdQuery:
+                 icuLocaleIdQuery = languageIdQuery+'_'+scriptIdQuery
+                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
+-                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    if cname:
++                        return lname + ' ('+cname+')'
++                    return lname
+             if  languageIdQuery and  territoryIdQuery:
+                 icuLocaleIdQuery = languageIdQuery+'_'+territoryIdQuery
+                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
+-                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    if cname:
++                        return lname + ' ('+cname+')'
++                    return lname
+             if languageIdQuery:
+                 icuLocaleIdQuery = languageIdQuery
+                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
+-                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
++                    if cname:
++                        return lname + ' ('+cname+')'
++                    return lname
+     if languageId and territoryId:
+         icuLocaleId = languageId+'_'+territoryId
+         if icuLocaleId in _languages_db:
+diff --git a/test_cases.txt b/test_cases.txt
+index c92bb35..7670361 100644
+--- a/test_cases.txt
++++ b/test_cases.txt
+@@ -753,10 +753,10 @@
+     Traditionelles Chinesisch (Taiwan)
+ 
+ >>> print language_name(languageId="zh", territoryId="TW", languageIdQuery="es").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    chino (Taiwán)
++    chino tradicional (Taiwán)
+ 
+ >>> print language_name(languageId="zh", territoryId="TW", languageIdQuery="es", territoryIdQuery="ES").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    chino (Taiwán)
++    chino tradicional (Taiwán)
+ 
+ >>> print language_name(languageId="zh", territoryId="TW", languageIdQuery="zh").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+     繁体中文 (台湾)
+@@ -771,19 +771,19 @@
+     繁體中文 (中華人民共和國澳門特別行政區)
+ 
+ >>> print language_name(languageId="zh", scriptId="Hans", territoryId="CN").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    简体中文
++    简体中文 (中国)
+ 
+ >>> print language_name(languageId="zh", scriptId="Hans", territoryId="SG").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    简体中文
++    简体中文 (新加坡)
+ 
+ >>> print language_name(languageId="zh", scriptId="Hant", territoryId="TW").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    繁體中文
++    繁體中文 (台灣)
+ 
+ >>> print language_name(languageId="zh", scriptId="Hant", territoryId="HK").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    繁體中文
++    繁體中文 (中華人民共和國香港特別行政區)
+ 
+ >>> print language_name(languageId="zh", scriptId="Hant", territoryId="MO").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    繁體中文
++    繁體中文 (中華人民共和國澳門特別行政區)
+ 
+ >>> print language_name(languageId="sr").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+     Српски
+@@ -801,10 +801,10 @@
+     Srpski (Latinica)
+ 
+ >>> print language_name(languageId="sr", scriptId="Cyrl", territoryId="RS").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    Српски (Ћирилица)
++    Српски (Ћирилица) (Србија)
+ 
+ >>> print language_name(languageId="sr", scriptId="Latn", territoryId="RS").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    Srpski (Latinica)
++    Srpski (Latinica) (Srbija)
+ 
+ >>> print language_name(languageId="sr", languageIdQuery="en").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+     Serbian
+@@ -816,14 +816,14 @@
+     Serbian (Montenegro)
+ 
+ >>> print language_name(languageId="sr", scriptId="Cyrl", territoryId="RS", languageIdQuery="en").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    Serbian (Cyrillic)
++    Serbian (Cyrillic) (Serbia)
+ 
+ >>> print language_name(languageId="sr", scriptId="Latn", territoryId="RS", languageIdQuery="en").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    Serbian (Latin)
++    Serbian (Latin) (Serbia)
+ 
+ # script and territory given in languageId override script and territory in extra parameters:
+ >>> print language_name(languageId="sr_Latn_RS", scriptId="Cyrl", territoryId="DE", languageIdQuery="en").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+-    Serbian (Latin)
++    Serbian (Latin) (Serbia)
+ 
+ >>> print language_name(languageId="be").encode("UTF-8") # doctest: +NORMALIZE_WHITESPACE
+     беларуская
+@@ -1054,7 +1054,7 @@
+ >>> print langtable.timezone_name(timezoneId='Europe/Berlin', languageIdQuery='zh_CN').encode('UTF-8')  # doctest: +NORMALIZE_WHITESPACE
+     欧洲/柏林
+ >>> print langtable.timezone_name(timezoneId='Europe/Berlin', languageIdQuery='zh_TW').encode('UTF-8')  # doctest: +NORMALIZE_WHITESPACE
+-    欧洲/柏林
++    歐洲/柏林
+ 
+ >>> print(langtable.timezone_name(timezoneId='GMT+1', languageIdQuery='cs'))  # doctest: +NORMALIZE_WHITESPACE
+     GMT+1
+-- 
+1.8.4.2
+
