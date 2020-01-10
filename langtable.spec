@@ -6,7 +6,7 @@
 
 Name:           langtable
 Version:        0.0.31
-Release:        4%{?dist}
+Release:        3%{?dist}
 Summary:        Guessing reasonable defaults for locale, keyboard layout, territory, and language.
 Group:          Development/Tools
 # the translations in languages.xml and territories.xml are (mostly)
@@ -24,7 +24,6 @@ Patch4:         Translation-fix-for-Tagalog-Filipino.patch
 Patch5:         Translation-fix-from-CLDR.patch
 Patch6:         Add-sphinx-markup-to-public-functions.patch
 Patch7:         Add-a-function-list_scripts-to-list-scripts-used-for.patch
-Patch8:         Make-tw-the-default-keyboard-layout-for-zh_TW.patch
 BuildArch:      noarch
 BuildRequires:  python2-devel
 %if 0%{?with_python3}
@@ -82,7 +81,6 @@ This package contains the data files for langtable.
 %patch5 -p1 -b .Translation-fix-from-CLDR
 %patch6 -p1 -b .Add-sphinx-markup-to-public-functions
 %patch7 -p1 -b .Add-a-function-list_scripts-to-list-scripts-used-for
-%patch8 -p1 -b .Make-tw-the-default-keyboard-layout-for-zh_TW
 
 %if 0%{?with_python3}
 rm -rf %{py3dir}
@@ -143,10 +141,6 @@ xmllint --noout --relaxng $RPM_BUILD_ROOT/%{_datadir}/langtable/schemas/timezone
 %{_datadir}/langtable/*.xml.gz
 
 %changelog
-* Fri May 10 2019 Mike FABIAN <mfabian@redhat.com> - 0.0.31-4
-- Make tw the default keyboard layout for zh_TW
-- Resolves: rhbz#1708092
-
 * Mon Jul 13 2015 Mike FABIAN <mfabian@redhat.com> - 0.0.31-3
 - Add patches to support listing scripts for languages and/or regions
 - Resolves: rhbz#1242571
