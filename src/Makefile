@@ -11,15 +11,11 @@ install:
 
 .PHONY: test
 test: install
-	python2 langtable.py
-	python3 langtable.py
-	(cd $(DATADIR); python2 $(SRCDIR)/test_cases.py)
-	(cd $(DATADIR); python3 $(SRCDIR)/test_cases.py)
+	python langtable.py
+	(cd $(DATADIR); python -m doctest $(SRCDIR)/test_cases.txt)
 	xmllint --noout --relaxng $(DATADIR)/schemas/keyboards.rng $(DATADIR)/keyboards.xml.gz
 	xmllint --noout --relaxng $(DATADIR)/schemas/languages.rng $(DATADIR)/languages.xml.gz
 	xmllint --noout --relaxng $(DATADIR)/schemas/territories.rng $(DATADIR)/territories.xml.gz
-	xmllint --noout --relaxng $(DATADIR)/schemas/timezones.rng $(DATADIR)/timezones.xml.gz
-	xmllint --noout --relaxng $(DATADIR)/schemas/timezoneidparts.rng $(DATADIR)/timezoneidparts.xml.gz
 
 .PHONY: dist
 dist:
@@ -48,5 +44,5 @@ review: mockbuild
 %.rnc: %.rng
 	trang $< $@
 
-rnc: schemas/keyboards.rnc schemas/languages.rnc schemas/territories.rnc schemas/timezones.rnc schemas/timezoneidparts.rnc
+rnc: schemas/keyboards.rnc schemas/languages.rnc schemas/territories.rnc
 	cp schemas/*.rnc data/

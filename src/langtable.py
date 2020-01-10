@@ -1,4 +1,4 @@
-# vim:fileencoding=utf-8:sw=4:et -*- coding: utf-8 -*-
+# vim:fileencoding=utf-8:sw=4:et
 
 # Copyright (c) 2013 Mike FABIAN <mfabian@redhat.com>
 #
@@ -21,11 +21,9 @@
 #     list_locales()
 #     list_keyboards()
 #     list_consolefonts()
-#     list_inputmethods()
 #     list_timezones()
 #     language_name()
 #     territory_name()
-#     timezone_name()
 #     languageId()
 #     territoryId()
 #     supports_ascii()
@@ -81,21 +79,18 @@ _glibc_script_ids = {
 _territories_db = {}
 _languages_db = {}
 _keyboards_db = {}
-_timezones_db = {}
-_timezoneIdParts_db = {}
 
 class territory_db_item:
-    def __init__(self, names = None, locales=None, languages=None, keyboards=None, inputmethods=None, consolefonts=None, timezones=None):
+    def __init__(self, names = None, locales=None, languages=None, keyboards=None, consolefonts=None, timezones=None):
         self.names = names
         self.locales = locales
         self.languages = languages
         self.keyboards = keyboards
-        self.inputmethods = inputmethods
         self.consolefonts = consolefonts
         self.timezones = timezones
 
 class language_db_item:
-    def __init__(self, iso639_1=None, iso639_2_t=None, iso639_2_b=None, names=None, locales=None, territories=None, keyboards=None, inputmethods=None, consolefonts=None, timezones=None):
+    def __init__(self, iso639_1=None, iso639_2_t=None, iso639_2_b=None, names=None, locales=None, territories=None, keyboards=None, consolefonts=None, timezones=None):
         self.iso639_1 = iso639_1
         self.iso639_2_t = iso639_2_t
         self.iso639_2_b = iso639_2_b
@@ -103,7 +98,6 @@ class language_db_item:
         self.locales = locales
         self.territories = territories
         self.keyboards = keyboards
-        self.inputmethods = inputmethods
         self.consolefonts = consolefonts
         self.timezones = timezones
 
@@ -114,14 +108,6 @@ class keyboard_db_item:
         self.comment = comment
         self.languages = languages
         self.territories = territories
-
-class timezone_db_item:
-    def __init__(self, names=None):
-        self.names = names
-
-class timezoneIdPart_db_item:
-    def __init__(self, names=None):
-        self.names = names
 
 # xml.sax.handler.ContentHandler is not inherited from the 'object' class,
 # 'super' keyword wouldn't work, we need to inherit it on our own
@@ -173,7 +159,6 @@ class TerritoriesContentHandler(LangtableContentHandler):
         self._locales = None
         self._languages = None
         self._keyboards = None
-        self._inputmethods = None
         self._consolefonts = None
         self._timezones = None
 
@@ -183,7 +168,6 @@ class TerritoriesContentHandler(LangtableContentHandler):
             self._locales = dict()
             self._languages = dict()
             self._keyboards = dict()
-            self._inputmethods = dict()
             self._consolefonts = dict()
             self._timezones = dict()
 
@@ -192,7 +176,7 @@ class TerritoriesContentHandler(LangtableContentHandler):
             self._save_to = "_territoryId"
 
         # dict items
-        elif name in (u"languageId", u"localeId", u"keyboardId", u"inputmethodId",
+        elif name in (u"languageId", u"localeId", u"keyboardId",
                       u"consolefontId", u"timezoneId"):
             self._save_to = "_item_id"
         elif name == u"trName":
@@ -211,7 +195,6 @@ class TerritoriesContentHandler(LangtableContentHandler):
                 locales = self._locales,
                 languages = self._languages,
                 keyboards = self._keyboards,
-                inputmethods = self._inputmethods,
                 consolefonts = self._consolefonts,
                 timezones = self._timezones)
 
@@ -221,7 +204,6 @@ class TerritoriesContentHandler(LangtableContentHandler):
             self._locales = None
             self._languages = None
             self._keyboards = None
-            self._inputmethods = None
             self._consolefonts = None
             self._timezones = None
 
@@ -237,9 +219,6 @@ class TerritoriesContentHandler(LangtableContentHandler):
             self._clear_item()
         elif name == u"keyboard":
             self._keyboards[str(self._item_id)] = int(self._item_rank)
-            self._clear_item()
-        elif name == u"inputmethod":
-            self._inputmethods[str(self._item_id)] = int(self._item_rank)
             self._clear_item()
         elif name == u"consolefont":
             self._consolefonts[str(self._item_id)] = int(self._item_rank)
@@ -352,7 +331,6 @@ class LanguagesContentHandler(LangtableContentHandler):
         self._locales = None
         self._territories = None
         self._keyboards = None
-        self._inputmethods = None
         self._consolefonts = None
         self._timezones = None
 
@@ -362,7 +340,6 @@ class LanguagesContentHandler(LangtableContentHandler):
             self._locales = dict()
             self._territories = dict()
             self._keyboards = dict()
-            self._inputmethods = dict()
             self._consolefonts = dict()
             self._timezones = dict()
 
@@ -380,7 +357,7 @@ class LanguagesContentHandler(LangtableContentHandler):
             self._in_names = True
 
         # dict items
-        elif name in (u"localeId", u"territoryId", u"keyboardId", u"inputmethodId",
+        elif name in (u"localeId", u"territoryId", u"keyboardId",
                       u"consolefontId", u"timezoneId"):
             self._save_to = "_item_id"
         elif name == u"languageId" and self._in_names:
@@ -405,7 +382,6 @@ class LanguagesContentHandler(LangtableContentHandler):
                 locales = self._locales,
                 territories = self._territories,
                 keyboards = self._keyboards,
-                inputmethods = self._inputmethods,
                 consolefonts = self._consolefonts,
                 timezones = self._timezones)
 
@@ -418,7 +394,6 @@ class LanguagesContentHandler(LangtableContentHandler):
             self._locales = None
             self._territories = None
             self._keyboards = None
-            self._inputmethods = None
             self._consolefonts = None
             self._timezones = None
 
@@ -439,9 +414,6 @@ class LanguagesContentHandler(LangtableContentHandler):
         elif name == u"keyboard":
             self._keyboards[str(self._item_id)] = int(self._item_rank)
             self._clear_item()
-        elif name == u"inputmethod":
-            self._inputmethods[str(self._item_id)] = int(self._item_rank)
-            self._clear_item()
         elif name == u"consolefont":
             self._consolefonts[str(self._item_id)] = int(self._item_rank)
             self._clear_item()
@@ -453,112 +425,6 @@ class LanguagesContentHandler(LangtableContentHandler):
         self._item_id = None
         self._item_name = None
         self._item_rank = None
-
-class TimezonesContentHandler(LangtableContentHandler):
-    """Handler for SAX events produced when parsing the timezones.xml file."""
-
-    def __init__(self):
-        super(TimezonesContentHandler, self).__init__()
-        # simple values
-        self._timezoneId = None
-
-        # helper variables
-        self._item_id = None
-        self._item_name = None
-
-        # dictionaries
-        self._names = None
-
-    def startElement(self, name, attrs):
-        if name == u"timezone":
-            self._names = dict()
-
-        # non-dict values
-        elif name == u"timezoneId":
-            # ID of the timezone
-            self._save_to = "_timezoneId"
-
-        # dict items
-        elif name == u"languageId":
-            # ID of the translated timezone's language
-            self._save_to = "_item_id"
-        elif name == u"trName":
-            self._save_to = "_item_name"
-
-    def endElement(self, name):
-        # we don't allow text to appear on the same level as elements so outside
-        # of an element no text should appear
-        self._save_to = None
-
-        if name == u"timezone":
-            _timezones_db[str(self._timezoneId)] = timezone_db_item(
-                names = self._names)
-
-            # clean after ourselves
-            self._timezoneId = None
-            self._names = None
-
-        # populating dictionaries
-        elif name == u"name":
-            self._names[str(self._item_id)] = self._item_name
-            self._clear_item()
-
-    def _clear_item(self):
-        self._item_id = None
-        self._item_name = None
-
-class TimezoneIdPartsContentHandler(LangtableContentHandler):
-    """Handler for SAX events produced when parsing the timezoneidparts.xml file."""
-
-    def __init__(self):
-        super(TimezoneIdPartsContentHandler, self).__init__()
-        # simple values
-        self._timezoneIdPartId = None
-
-        # helper variables
-        self._item_id = None
-        self._item_name = None
-
-        # dictionaries
-        self._names = None
-
-    def startElement(self, name, attrs):
-        if name == u"timezoneIdPart":
-            self._names = dict()
-
-        # non-dict values
-        elif name == u"timezoneIdPartId":
-            # partial timezone ID
-            self._save_to = "_timezoneIdPartId"
-
-        # dict items
-        elif name == u"languageId":
-            # ID of the translated partial timezone ID's language
-            self._save_to = "_item_id"
-        elif name == u"trName":
-            self._save_to = "_item_name"
-
-    def endElement(self, name):
-        # we don't allow text to appear on the same level as elements so outside
-        # of an element no text should appear
-        self._save_to = None
-
-        if name == u"timezoneIdPart":
-            _timezoneIdParts_db[str(self._timezoneIdPartId)] = timezoneIdPart_db_item(
-                names = self._names)
-
-            # clean after ourselves
-            self._timezoneIdPartId = None
-            self._names = None
-
-        # populating dictionaries
-        elif name == u"name":
-            self._names[str(self._item_id)] = self._item_name
-            self._clear_item()
-
-    def _clear_item(self):
-        self._item_id = None
-        self._item_name = None
 
 def _write_territories_file(file):
     '''
@@ -575,7 +441,7 @@ def _write_territories_file(file):
             file.write(
                 '      <name>'
                 +'<languageId>'+name+'</languageId>'
-                +'<trName>'+names[name]+'</trName>'
+                +'<trName>'+names[name].encode('UTF-8')+'</trName>'
                 +'</name>\n')
         file.write('    </names>\n')
         locales = _territories_db[territoryId].locales
@@ -605,15 +471,6 @@ def _write_territories_file(file):
                 +'<rank>'+str(rank)+'</rank>'
                 +'</keyboard>\n')
         file.write('    </keyboards>\n')
-        inputmethods = _territories_db[territoryId].inputmethods
-        file.write('    <inputmethods>\n')
-        for inputmethodId, rank in sorted(inputmethods.items(), key=lambda x: (-1*x[1],x[0])):
-            file.write(
-                '      <inputmethod>'
-                +'<inputmethodId>'+inputmethodId+'</inputmethodId>'
-                +'<rank>'+str(rank)+'</rank>'
-                +'</inputmethod>\n')
-        file.write('    </inputmethods>\n')
         consolefonts = _territories_db[territoryId].consolefonts
         file.write('    <consolefonts>\n')
         for consolefontId, rank in sorted(consolefonts.items(), key=lambda x: (-1*x[1],x[0])):
@@ -654,7 +511,7 @@ def _write_languages_file(file):
             file.write(
                 '      <name>'
                 +'<languageId>'+name+'</languageId>'
-                +'<trName>'+names[name]+'</trName>'
+                +'<trName>'+names[name].encode('UTF-8')+'</trName>'
                 +'</name>\n')
         file.write('    </names>\n')
         locales = _languages_db[languageId].locales
@@ -684,15 +541,6 @@ def _write_languages_file(file):
                 +'<rank>'+str(rank)+'</rank>'
                 +'</keyboard>\n')
         file.write('    </keyboards>\n')
-        inputmethods = _languages_db[languageId].inputmethods
-        file.write('    <inputmethods>\n')
-        for inputmethodId, rank in sorted(inputmethods.items(), key=lambda x: (-1*x[1],x[0])):
-            file.write(
-                '      <inputmethod>'
-                +'<inputmethodId>'+inputmethodId+'</inputmethodId>'
-                +'<rank>'+str(rank)+'</rank>'
-                +'</inputmethod>\n')
-        file.write('    </inputmethods>\n')
         consolefonts = _languages_db[languageId].consolefonts
         file.write('    <consolefonts>\n')
         for consolefontId, rank in sorted(consolefonts.items(), key=lambda x: (-1*x[1],x[0])):
@@ -727,7 +575,7 @@ def _write_keyboards_file(file):
         file.write('    <description>'+_keyboards_db[keyboardId].description+'</description>\n')
         file.write('    <ascii>'+str(_keyboards_db[keyboardId].ascii)+'</ascii>\n')
         if _keyboards_db[keyboardId].comment != None:
-            file.write('    <comment>'+_keyboards_db[keyboardId].comment+'</comment>\n')
+            file.write('    <comment>'+_keyboards_db[keyboardId].comment.encode('UTF-8')+'</comment>\n')
         languages = _keyboards_db[keyboardId].languages
         file.write('    <languages>\n')
         for languageId, rank in sorted(languages.items(), key=lambda x: (-1*x[1],x[0])):
@@ -750,50 +598,6 @@ def _write_keyboards_file(file):
     file.write('</keyboards>\n')
     return
 
-def _write_timezones_file(file):
-    '''
-    Only for internal use
-    '''
-    file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    file.write('<timezones>\n')
-    for timezoneId in sorted(_timezones_db):
-        file.write('  <timezone>\n')
-        file.write('    <timezoneId>'+timezoneId+'</timezoneId>\n')
-        names = _timezones_db[timezoneId].names
-        file.write('    <names>\n')
-        for name in sorted(names):
-            file.write(
-                '      <name>'
-                +'<languageId>'+name+'</languageId>'
-                +'<trName>'+names[name]+'</trName>'
-                +'</name>\n')
-        file.write('    </names>\n')
-        file.write('  </timezone>\n')
-    file.write('</timezones>\n')
-    return
-
-def _write_timezoneIdParts_file(file):
-    '''
-    Only for internal use
-    '''
-    file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    file.write('<timezoneIdParts>\n')
-    for timezoneIdPartId in sorted(_timezoneIdParts_db):
-        file.write('  <timezoneIdPart>\n')
-        file.write('    <timezoneIdPartId>'+timezoneIdPartId+'</timezoneIdPartId>\n')
-        names = _timezoneIdParts_db[timezoneIdPartId].names
-        file.write('    <names>\n')
-        for name in sorted(names):
-            file.write(
-                '      <name>'
-                +'<languageId>'+name+'</languageId>'
-                +'<trName>'+names[name]+'</trName>'
-                +'</name>\n')
-        file.write('    </names>\n')
-        file.write('  </timezoneIdPart>\n')
-    file.write('</timezoneIdParts>\n')
-    return
-
 def _expat_parse(file, sax_handler):
     """
     Only for internal use. Parses a given file object with a given SAX handler
@@ -814,19 +618,19 @@ def _read_file(datadir, filename, sax_handler):
     for dir in [datadir, '.']:
         path = os.path.join(dir, filename)
         if os.path.isfile(path):
-            with open(path, mode='rb') as file:
+            with open(path) as file:
                 logging.info('reading file=%s' %file)
                 _expat_parse(file, sax_handler)
             return
         path = os.path.join(dir, filename+'.gz')
         if os.path.isfile(path):
-            with gzip.open(path, mode='rb') as file:
+            with gzip.open(path) as file:
                 logging.info('reading file=%s' %file)
                 _expat_parse(file, sax_handler)
             return
     logging.info('no readable file found.')
 
-def _write_files(territoriesfilename, languagesfilename, keyboardsfilename, timezonesfilename, timezoneidpartsfilename):
+def _write_files(territoriesfilename, languagesfilename, keyboardsfilename):
     '''
     Only for internal use
     '''
@@ -839,26 +643,16 @@ def _write_files(territoriesfilename, languagesfilename, keyboardsfilename, time
     with open(keyboardsfilename, 'w') as keyboardsfile:
         logging.info("writing keyboards file=%s" %keyboardsfile)
         _write_keyboards_file(keyboardsfile)
-    with open(keyboardsfilename, 'w') as keyboardsfile:
-        logging.info("writing keyboards file=%s" %keyboardsfile)
-        _write_keyboards_file(keyboardsfile)
-    with open(timezonesfilename, 'w') as timezonesfile:
-        logging.info("writing timezones file=%s" %timezonesfile)
-        _write_timezones_file(timezonesfile)
-    with open(timezoneidpartsfilename, 'w') as timezoneidpartsfile:
-        logging.info("writing timezoneidparts file=%s" %timezoneidpartsfile)
-        _write_timezoneIdParts_file(timezoneidpartsfile)
     return
 
 def _dictionary_to_ranked_list(dict, reverse=True):
     sorted_list = []
-    for item in sorted(dict, key=lambda x: (dict.get(x), x), reverse=reverse):
-        if dict[item] != 0:
-            sorted_list.append([item, dict[item]])
+    for item in sorted(dict, key=dict.get, reverse=reverse):
+        sorted_list.append([item, dict[item]])
     return sorted_list
 
-def _ranked_list_to_list(ranked_list):
-    return list(map(lambda x: x[0], ranked_list))
+def _ranked_list_to_list(list):
+    return map(lambda x: x[0], list)
 
 def _make_ranked_list_concise(ranked_list, cut_off_factor=1000):
     if not len(ranked_list) > 1:
@@ -896,34 +690,22 @@ def _parse_and_split_languageId(languageId=None, scriptId=None, territoryId=None
                 territoryId = match.group('territory')
         else:
             logging.info("languageId contains invalid locale id=%s" %languageId)
-    # if the language is Chinese and only the territory is given
-    # but not the script, add the default script for the territory:
-    if languageId == 'zh' and territoryId and not scriptId:
-        if territoryId in ['CN', 'SG']:
-            scriptId = 'Hans'
-        elif territoryId in ['HK', 'MO', 'TW']:
-            scriptId = 'Hant'
     return (languageId, scriptId, territoryId)
 
 def territory_name(territoryId = None, languageIdQuery = None, scriptIdQuery = None, territoryIdQuery = None):
-    u'''Query translations of territory names
+    '''Query translations of territory names
 
     Examples:
 
     Switzerland is called “Schweiz” in German:
 
-    >>> print(territory_name(territoryId="CH", languageIdQuery="de"))
+    >>> print territory_name(territoryId="CH", languageIdQuery="de").encode("UTF-8")
     Schweiz
 
     And it is called “Svizzera” in Italian:
 
-    >>> print(territory_name(territoryId="CH", languageIdQuery="it"))
+    >>> print territory_name(territoryId="CH", languageIdQuery="it").encode("UTF-8")
     Svizzera
-
-    And it is called “スイス” in Japanese:
-
-    >>> print(territory_name(territoryId="CH", languageIdQuery="ja"))
-    スイス
     '''
     languageIdQuery, scriptIdQuery, territoryIdQuery = _parse_and_split_languageId(
         languageId=languageIdQuery,
@@ -949,38 +731,38 @@ def territory_name(territoryId = None, languageIdQuery = None, scriptIdQuery = N
     return ''
 
 def language_name(languageId = None, scriptId = None, territoryId = None, languageIdQuery = None, scriptIdQuery = None, territoryIdQuery = None):
-    u'''Query translations of language names
+    '''Query translations of language names
 
     Examples:
 
-    >>> print(language_name(languageId="sr"))
-    српски
+    >>> print language_name(languageId="sr").encode("UTF-8")
+    Српски
 
     I.e. the endonym for “Serbian” in the default Cyrillic script is
-    “српски”.
+    “Српски”.
 
     If the script “Cyrl” is supplied as well, the name of the
     script is added for clarity:
 
-    >>> print(language_name(languageId="sr", scriptId="Cyrl"))
-    српски (Ћирилица)
+    >>> print language_name(languageId="sr", scriptId="Cyrl").encode("UTF-8")
+    Српски (Ћирилица)
 
     And in Latin script the endonym is:
 
-    >>> print(language_name(languageId="sr", scriptId="Latn"))
+    >>> print language_name(languageId="sr", scriptId="Latn").encode("UTF-8")
     Srpski (Latinica)
 
     And “Serbian” translated to English is:
 
-    >>> print(language_name(languageId="sr", languageIdQuery="en"))
+    >>> print language_name(languageId="sr", languageIdQuery="en").encode("UTF-8")
     Serbian
 
     And with adding the script information:
 
-    >>> print(language_name(languageId="sr", scriptId="Cyrl", languageIdQuery="en"))
+    >>> print language_name(languageId="sr", scriptId="Cyrl", languageIdQuery="en").encode("UTF-8")
     Serbian (Cyrillic)
 
-    >>> print(language_name(languageId="sr", scriptId="Latn", languageIdQuery="en"))
+    >>> print language_name(languageId="sr", scriptId="Latn", languageIdQuery="en").encode("UTF-8")
     Serbian (Latin)
 
     '''
@@ -1019,38 +801,22 @@ def language_name(languageId = None, scriptId = None, territoryId = None, langua
     if languageId and scriptId:
         icuLocaleId = languageId+'_'+scriptId
         if icuLocaleId in _languages_db:
-            cname = territory_name(territoryId=territoryId,
-                                   languageIdQuery=languageIdQuery,
-                                   scriptIdQuery=scriptIdQuery,
-                                   territoryIdQuery=territoryIdQuery)
             if languageIdQuery and  scriptIdQuery and territoryIdQuery:
                 icuLocaleIdQuery = languageIdQuery+'_'+scriptIdQuery+'_'+territoryIdQuery
                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
-                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
-                    if cname:
-                        return lname + ' ('+cname+')'
-                    return lname
+                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
             if languageIdQuery and  scriptIdQuery:
                 icuLocaleIdQuery = languageIdQuery+'_'+scriptIdQuery
                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
-                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
-                    if cname:
-                        return lname + ' ('+cname+')'
-                    return lname
+                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
             if  languageIdQuery and  territoryIdQuery:
                 icuLocaleIdQuery = languageIdQuery+'_'+territoryIdQuery
                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
-                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
-                    if cname:
-                        return lname + ' ('+cname+')'
-                    return lname
+                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
             if languageIdQuery:
                 icuLocaleIdQuery = languageIdQuery
                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
-                    lname = _languages_db[icuLocaleId].names[icuLocaleIdQuery]
-                    if cname:
-                        return lname + ' ('+cname+')'
-                    return lname
+                    return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
     if languageId and territoryId:
         icuLocaleId = languageId+'_'+territoryId
         if icuLocaleId in _languages_db:
@@ -1100,88 +866,6 @@ def language_name(languageId = None, scriptId = None, territoryId = None, langua
                 if icuLocaleIdQuery in _languages_db[icuLocaleId].names:
                     return _languages_db[icuLocaleId].names[icuLocaleIdQuery]
     return ''
-
-def _timezone_name_from_id_parts(timezoneId = None, icuLocaleIdQuery = None):
-    '''Query translation of timezone IDs by querying translations
-    for each part of the ID seperately and putting the results together
-    '''
-    if not (timezoneId and icuLocaleIdQuery):
-        return ''
-    timezoneId_parts = timezoneId.split('/')
-    part_names = []
-    for timezoneId_part in timezoneId_parts:
-        if timezoneId_part not in _timezoneIdParts_db:
-            part_names.append(timezoneId_part)
-            continue
-        if icuLocaleIdQuery in _timezoneIdParts_db[timezoneId_part].names:
-            name = _timezoneIdParts_db[timezoneId_part].names[icuLocaleIdQuery]
-            if name:
-                part_names.append(name)
-        elif icuLocaleIdQuery == 'en':
-            name = timezoneId_part.replace('_', ' ')
-            part_names.append(name)
-    if len(part_names) == len(timezoneId_parts):
-        return u'/'.join(part_names)
-    return ''
-
-def _timezone_name(timezoneId = None, icuLocaleIdQuery = None):
-    '''
-    Internal helper function to translate timezone IDs
-    '''
-    if not (timezoneId and icuLocaleIdQuery):
-        return ''
-    if timezoneId in _timezones_db:
-        if icuLocaleIdQuery in _timezones_db[timezoneId].names:
-            return _timezones_db[timezoneId].names[icuLocaleIdQuery]
-    name_from_parts = _timezone_name_from_id_parts(
-        timezoneId=timezoneId, icuLocaleIdQuery=icuLocaleIdQuery)
-    if name_from_parts:
-        return name_from_parts
-    return ''
-
-def timezone_name(timezoneId = None, languageIdQuery = None, scriptIdQuery = None, territoryIdQuery = None):
-    u'''Query translations of timezone IDs
-
-    Examples:
-
-    >>> print(timezone_name(timezoneId='US/Pacific', languageIdQuery='ja'))
-    アメリカ合衆国/太平洋時間
-
-    If no translation can be found, the timezone ID is returned
-    unchanged:
-
-    >>> print(timezone_name(timezoneId='Pacific/Pago_Pago', languageIdQuery='xxx'))
-    Pacific/Pago_Pago
-    '''
-    languageIdQuery, scriptIdQuery, territoryIdQuery = _parse_and_split_languageId(
-        languageId=languageIdQuery,
-        scriptId=scriptIdQuery,
-        territoryId=territoryIdQuery)
-    if languageIdQuery and scriptIdQuery and territoryIdQuery:
-        name = _timezone_name(
-            timezoneId=timezoneId,
-            icuLocaleIdQuery=languageIdQuery+'_'+scriptIdQuery+'_'+territoryIdQuery)
-        if name:
-            return name
-    if languageIdQuery and scriptIdQuery:
-        name = _timezone_name(
-            timezoneId=timezoneId,
-            icuLocaleIdQuery=languageIdQuery+'_'+scriptIdQuery)
-        if name:
-            return name
-    if languageIdQuery and territoryIdQuery:
-        name = _timezone_name(
-            timezoneId=timezoneId,
-            icuLocaleIdQuery=languageIdQuery+'_'+territoryIdQuery)
-        if name:
-            return name
-    if languageIdQuery:
-        name = _timezone_name(
-            timezoneId=timezoneId,
-            icuLocaleIdQuery=languageIdQuery)
-        if name:
-            return name
-    return timezoneId
 
 def territoryId(territoryName = u''):
     '''Query the territoryId from a translated name of a territory.
@@ -1246,7 +930,7 @@ def languageId(languageName = u''):
             if languageName.lower() == _languages_db[languageId].names[icuLocaleId].lower():
                 return languageId
     language_territory_pattern = re.compile(
-        r'^(?P<language_name>[^()]+)[\s]+[(](?P<territory_name>[^()]+)[)]',
+        r'^(?P<language_name>[\S]+)[\s]+[(](?P<territory_name>[\S]+)[)]',
         re.MULTILINE|re.UNICODE)
     match = language_territory_pattern.search(languageName)
     if match:
@@ -1333,68 +1017,6 @@ def list_locales(concise=True, show_weights=False, languageId = None, scriptId =
     else:
         return _ranked_list_to_list(ranked_list)
 
-def list_inputmethods(concise=True, show_weights=False, languageId = None, scriptId = None, territoryId = None):
-    '''List suitable input methods
-
-    Examples:
-
-    List the suitable input methods for the language “Japanese”:
-
-    >>> list_inputmethods(languageId="ja")
-    ['ibus/kkc', 'ibus/anthy']
-
-    So this returns a list of input methods for Japanese. These lists are
-    sorted in order of decreasing likelyhood, i.e. the most common
-    value comes first.
-
-    One can also list the possible input methods for the territory “Japan”:
-
-    >>> list_inputmethods(territoryId="JP")
-    ['ibus/kkc', 'ibus/anthy']
-    '''
-    ranked_inputmethods = {}
-    skipTerritory = False
-    languageId, scriptId, territoryId = _parse_and_split_languageId(
-        languageId=languageId,
-        scriptId=scriptId,
-        territoryId=territoryId)
-    if languageId and scriptId and territoryId and languageId+'_'+scriptId+'_'+territoryId in _languages_db:
-        languageId = languageId+'_'+scriptId+'_'+territoryId
-        skipTerritory = True
-    elif languageId and scriptId and languageId+'_'+scriptId in _languages_db:
-        languageId = languageId+'_'+scriptId
-        skipTerritory = True
-    elif languageId and territoryId and languageId+'_'+territoryId in _languages_db:
-        languageId = languageId+'_'+territoryId
-        skipTerritory = True
-    language_bonus = 100
-    if languageId in _languages_db:
-        for inputmethod in _languages_db[languageId].inputmethods:
-            if _languages_db[languageId].inputmethods[inputmethod] != 0:
-                if inputmethod not in ranked_inputmethods:
-                    ranked_inputmethods[inputmethod] = _languages_db[languageId].inputmethods[inputmethod]
-                else:
-                    ranked_inputmethods[inputmethod] *= _languages_db[languageId].inputmethods[inputmethod]
-                    ranked_inputmethods[inputmethod] *= extra_bonus
-                ranked_inputmethods[inputmethod] *= language_bonus
-    territory_bonus = 1
-    if territoryId in _territories_db and not skipTerritory:
-        for inputmethod in _territories_db[territoryId].inputmethods:
-            if _territories_db[territoryId].inputmethods[inputmethod] != 0:
-                if inputmethod not in ranked_inputmethods:
-                    ranked_inputmethods[inputmethod] = _territories_db[territoryId].inputmethods[inputmethod]
-                else:
-                    ranked_inputmethods[inputmethod] *= _territories_db[territoryId].inputmethods[inputmethod]
-                    ranked_inputmethods[inputmethod] *= extra_bonus
-                ranked_inputmethods[inputmethod] *= territory_bonus
-    ranked_list = _dictionary_to_ranked_list(ranked_inputmethods)
-    if concise:
-        ranked_list = _make_ranked_list_concise(ranked_list)
-    if show_weights:
-        return ranked_list
-    else:
-        return _ranked_list_to_list(ranked_list)
-
 def list_keyboards(concise=True, show_weights=False, languageId = None, scriptId = None, territoryId = None):
     '''List likely X11 keyboard layouts
 
@@ -1459,46 +1081,35 @@ def list_keyboards(concise=True, show_weights=False, languageId = None, scriptId
         return _ranked_list_to_list(ranked_list)
 
 def list_consolefonts(concise=True, show_weights=False, languageId = None, scriptId = None, territoryId = None):
-    u'''List likely Linux Console fonts
+    '''List likely Linux Console fonts
 
     Examples:
 
     Listing likely console fonts  for English:
 
     >>> list_consolefonts(languageId="en")
-    ['eurlatgr']
+    ['latarcyrheb-sun16']
 
     Listing likely console fonts for Greek:
 
     >>> list_consolefonts(languageId="el")
-    ['eurlatgr', 'iso07u-16', 'LatGrkCyr-8x16']
+    ['iso07u-16', 'LatGrkCyr-8x16']
 
     Listing likely console fonts for Greece:
 
     >>> list_consolefonts(territoryId="GR")
-    ['eurlatgr', 'iso07u-16', 'LatGrkCyr-8x16']
+    ['iso07u-16', 'LatGrkCyr-8x16']
 
     Listing likely console fonts for Greek in Greece:
 
     list_consolefonts(languageId="el", territoryId="GR")
-    ['eurlatgr']
+    ['iso07u-16']
 
     Listing likely console fonts for Greek in a non-Greek country like
     the UK (the language has higher weight):
 
     >>> list_consolefonts(languageId="el", territoryId="GB")
-    ['eurlatgr']
-
-    Listing likely console fonts for Russian in Russia:
-
-    >>> list_consolefonts(languageId="ru", territoryId="RU")
-    ['latarcyrheb-sun16']
-
-    Listing likely console fonts for Russian in a non-Russian country like
-    the UK (the language has higher weight):
-
-    >>> list_consolefonts(languageId="ru", territoryId="GB")
-    ['latarcyrheb-sun16', 'eurlatgr']
+    ['iso07u-16', 'LatGrkCyr-8x16', 'latarcyrheb-sun16']
 
     '''
     ranked_consolefonts = {}
@@ -1675,8 +1286,6 @@ def _init(debug = False,
     _read_file(datadir, 'territories.xml', TerritoriesContentHandler())
     _read_file(datadir, 'languages.xml', LanguagesContentHandler())
     _read_file(datadir, 'keyboards.xml', KeyboardsContentHandler())
-    _read_file(datadir, 'timezones.xml', TimezonesContentHandler())
-    _read_file(datadir, 'timezoneidparts.xml', TimezoneIdPartsContentHandler())
 
 class __ModuleInitializer:
     def __init__(self):

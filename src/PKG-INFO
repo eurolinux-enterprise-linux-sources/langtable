@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: langtable
-Version: 0.0.31
+Version: 0.0.13
 Summary: guess reasonable defaults for locale, keyboard, territory, ...
 Home-page: https://github.com/mike-fabian/langtable
 Author: Mike FABIAN
@@ -68,7 +68,7 @@ Description: ===================================================================
         Some examples to show the usage are found in the documentation
         of the public functions in langtable.py.
         
-        (Some more examples are in the test cases in the file test_cases.py):
+        (Some more examples are in the test cases in the file test_cases.txt):
         
 Platform: UNKNOWN
 Classifier: Development Status :: 2 - Pre-Alpha
