@@ -1,0 +1,41 @@
+From c71277da7a3c2322b9c1030a7ae8bd9252023849 Mon Sep 17 00:00:00 2001
+From: Mike FABIAN <mfabian@redhat.com>
+Date: Tue, 12 May 2015 14:48:34 +0200
+Subject: [PATCH 1/8] Add language endonym for tl
+
+Resolves: rhbz#1220783 - langtable has information about tl language (Tagalog) but does not have the language endonym
+See: https://bugzilla.redhat.com/show_bug.cgi?id=1220783
+---
+ data/languages.xml | 1 +
+ test_cases.py      | 3 +++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/data/languages.xml b/data/languages.xml
+index f17d305..d5a9f00 100644
+--- a/data/languages.xml
++++ b/data/languages.xml
+@@ -21734,6 +21734,7 @@
+       <name><languageId>te</languageId><trName>తగలోగ్</trName></name>
+       <name><languageId>th</languageId><trName>ตากาล็อก</trName></name>
+       <name><languageId>tig</languageId><trName>ታጋሎገኛ</trName></name>
++      <name><languageId>tl</languageId><trName>Tagalog</trName></name>
+       <name><languageId>tr</languageId><trName>Takalotça</trName></name>
+       <name><languageId>ug</languageId><trName>تاگالوگچە</trName></name>
+       <name><languageId>uk</languageId><trName>тагальська</trName></name>
+diff --git a/test_cases.py b/test_cases.py
+index ea28126..667c293 100644
+--- a/test_cases.py
++++ b/test_cases.py
+@@ -1054,6 +1054,9 @@ def dummy():
+     >>> print(language_name(languageId="pa", scriptId="Guru")) # doctest: +NORMALIZE_WHITESPACE
+         ਪੰਜਾਬੀ
+ 
++    >>> print(language_name(languageId="tl")) # doctest: +NORMALIZE_WHITESPACE
++        Tagalog
++
+     >>> print(territory_name(territoryId="AE", languageIdQuery="ar")) # doctest: +NORMALIZE_WHITESPACE
+         الإمارات العربية المتحدة
+ 
+-- 
+2.4.3
+

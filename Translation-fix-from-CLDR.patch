@@ -1,0 +1,25 @@
+From 77994edd01623d3bef8df0c99db05527e8ec0dbc Mon Sep 17 00:00:00 2001
+From: Mike FABIAN <mfabian@redhat.com>
+Date: Tue, 23 Jun 2015 10:19:35 +0200
+Subject: [PATCH 5/8] Translation fix from CLDR
+
+---
+ data/languages.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/data/languages.xml b/data/languages.xml
+index d4f80fb..ecf967a 100644
+--- a/data/languages.xml
++++ b/data/languages.xml
+@@ -23503,7 +23503,7 @@
+       <name><languageId>th</languageId><trName>วัลเซอร์</trName></name>
+       <name><languageId>tr</languageId><trName>Walser</trName></name>
+       <name><languageId>ug</languageId><trName>ۋالسېرچە</trName></name>
+-      <name><languageId>uk</languageId><trName>Валзерська</trName></name>
++      <name><languageId>uk</languageId><trName>валзерська</trName></name>
+       <name><languageId>vi</languageId><trName>Tiếng Walser</trName></name>
+       <name><languageId>wae</languageId><trName>Walser</trName></name>
+       <name><languageId>zh</languageId><trName>瓦尔瑟文</trName></name>
+-- 
+2.4.3
+
